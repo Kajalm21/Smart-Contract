@@ -25,10 +25,3 @@ This Solidity smart contract enables basic fraction operations with robust error
 
 4. **Trigger Revert**:
    - Demonstrate revert behavior with `triggerRevert()`.
-
-## Installation
-
-1. Clone the repository:
-   ```sh
-   git clone https://github.com/yourusername/FractionOperations.git
-   cd FractionOperations
