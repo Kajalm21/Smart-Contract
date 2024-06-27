@@ -1,65 +1,54 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-contract Voting {
-    struct Poll {
-        string question;
-        string[] options;
-        mapping(uint256 => uint256) votes;
-        bool exists;
+contract FractionOperations {
+    uint256 public numerator;
+    uint256 public denominator;
+
+    // Set the numerator value
+    function setNumerator(uint256 _numerator) public {
+        numerator = _numerator;
     }
 
-    mapping(uint256 => Poll) private polls;
-    uint256 private pollCount;
-    address public owner;
-
-    constructor() {
-        owner = msg.sender;
+    // Set the denominator value
+    function setDenominator(uint256 _denominator) public {
+        require(_denominator != 0, "Denominator cannot be zero");
+        denominator = _denominator;
     }
 
-    // Create a new poll
-    function createPoll(string memory question, string[] memory options) public {
-        require(msg.sender == owner, "Only the owner can create polls");
-        require(options.length > 1, "Poll must have at least two options");
+    // Divide numerator by denominator
+    function divide() public view returns (uint256) {
+        require(denominator != 0, "Cannot divide by zero");
 
-        Poll storage newPoll = polls[pollCount];
-        newPoll.question = question;
-        newPoll.options = options;
-        newPoll.exists = true;
+        uint256 result = numerator / denominator;
+        
+        // Assert to ensure result is consistent with the expected value
+        assert(result * denominator + numerator % denominator == numerator);
 
-        pollCount++;
+        return result;
     }
 
-    // Vote in a poll
-    function vote(uint256 pollId, uint256 optionIndex) public {
-        require(polls[pollId].exists, "Poll does not exist");
-        require(optionIndex < polls[pollId].options.length, "Invalid option");
+    // Multiply numerator and denominator
+    function multiply(uint256 factor) public view returns (uint256) {
+        uint256 result = numerator * factor;
+        
+        // Assert to ensure result is consistent with multiplication properties
+        assert(result / factor == numerator);
 
-        Poll storage poll = polls[pollId];
-        poll.votes[optionIndex]++;
+        return result;
     }
 
-    // Get poll results
-    function getResults(uint256 pollId) public view returns (string memory question, uint256[] memory results) {
-        require(polls[pollId].exists, "Poll does not exist");
-
-        Poll storage poll = polls[pollId];
-        uint256[] memory resultsArray = new uint256[](poll.options.length);
-
-        for (uint256 i = 0; i < poll.options.length; i++) {
-            resultsArray[i] = poll.votes[i];
-        }
-
-        return (poll.question, resultsArray);
+    // Reset the fraction to initial values
+    function reset() public {
+        numerator = 0;
+        denominator = 1;
+        
+        // Ensure the reset has been successful
+        assert(numerator == 0 && denominator == 1);
     }
 
-    // Assert example function to check contract owner
-    function checkOwner() public view {
-        assert(msg.sender == owner);
-    }
-
-    // Revert example function to demonstrate revert statement
-    function revertExample() public pure {
+    // Function to simulate an error and demonstrate revert
+    function triggerRevert() public pure {
         revert("This function always reverts");
     }
 }
